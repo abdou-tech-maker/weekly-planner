@@ -25,18 +25,18 @@ class _MainScreenState extends State<MainScreen> {
   List<PersistentBottomNavBarItem> _navBarsItems() {
     return [
       PersistentBottomNavBarItem(
-          inactiveIcon: const Icon(Icons.date_range, color: liteTxt),
+          inactiveIcon: const Icon(Icons.date_range, color: mainColor),
           icon: const Icon(
             Icons.date_range,
             color: mainColor,
           )),
       PersistentBottomNavBarItem(
         inactiveIcon: const Icon(
-          Icons.place,
-          color: liteTxt,
+          Icons.access_time,
+          color: mainColor,
         ),
         icon: const Icon(
-          Icons.place,
+          Icons.access_time,
           color: mainColor,
         ),
       ),
