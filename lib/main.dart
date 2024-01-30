@@ -1,7 +1,33 @@
+// ignore_for_file: library_prefixes
+
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart' as pathProvider;
 import 'package:weekly_planner/mainScreen.dart';
 
-void main() {
+import 'models/user_model.dart';
+import 'models/user_picture.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  Directory directory = await pathProvider.getApplicationDocumentsDirectory();
+  Hive.init(directory.path);
+
+  Hive.registerAdapter(UserModelAdapter());
+  Hive.registerAdapter(UserPictureAdapter());
+  await Hive.openBox<UserModel>('UserModel');
+  await Hive.openBox<UserPicture>('UserPicture');
+  var user =
+      UserModel(id: 1, username: 'Maher', fullname: 'Bekkouche', role: 'Manager'
+          // Add other properties here
+          );
+
+  // Save the user to the Hive box
+  await UserModel.set(user);
+
   runApp(const MyApp());
 }
 
@@ -14,7 +40,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        useMaterial3: false,
       ),
       home: const MainScreen(),
     );

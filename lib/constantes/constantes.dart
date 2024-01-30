@@ -9,7 +9,7 @@ const Color mainColor = Color(0xFF001F3F);
 const Color liteTxt = Color(0xFFB9BCBE);
 
 const Color blackText = Color(0xFF23272A);
-const Color backGround = Color(0xFFEDF2FF);
+const Color backGround = Color.fromARGB(255, 242, 245, 251);
 const Color redColor = Color(0xFFD8192C);
 
 //const Color backGround = Color(0xFFF7F9FF);
