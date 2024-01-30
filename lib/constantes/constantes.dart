@@ -53,6 +53,9 @@ String getCreatedAtDate(String? createdAt) {
   return extractedDate;
 }
 
+TextStyle? simple =
+    GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500);
+
 Color getColor(String status) {
   switch (status) {
     case "Confirmed":
