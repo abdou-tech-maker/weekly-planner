@@ -1,11 +1,18 @@
+import 'dart:developer';
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 import '../constantes/constantes.dart';
 import '../widgets/appHeader.dart';
 
 class Planing extends StatefulWidget {
-  const Planing({super.key});
+  const Planing({Key? key}) : super(key: key);
 
   @override
   State<Planing> createState() => _PlaningState();
@@ -38,12 +45,61 @@ class _PlaningState extends State<Planing> {
     );
   }
 
+  Future<void> generatePdf() async {
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.MultiPage(
+        build: (context) => [
+          pw.Table.fromTextArray(
+            context: context,
+            data: [
+              ['Server \\ Days', ...daysOfWeek],
+              for (var memberIndex = 0;
+                  memberIndex < members.length;
+                  memberIndex++)
+                [
+                  members[memberIndex],
+                  for (var dayIndex = 0;
+                      dayIndex < daysOfWeek.length;
+                      dayIndex++)
+                    weeklyPlanning[dayIndex][memberIndex],
+                ],
+            ],
+            headerDecoration: const pw.BoxDecoration(
+              color: PdfColors.grey300,
+            ),
+            rowDecoration: const pw.BoxDecoration(
+              border: pw.Border(),
+            ),
+            headers: List<String>.generate(daysOfWeek.length + 1, (index) {
+              if (index == 0) {
+                return 'Server \\ Days';
+              } else {
+                return daysOfWeek[index - 1];
+              }
+            }),
+          ),
+        ],
+      ),
+    );
+
+    final Directory directory = await getApplicationDocumentsDirectory();
+    final String path = '${directory.path}/weekly_planning.pdf';
+
+    final File file = File(path);
+    final Uint8List pdfBytes = await pdf.save();
+    await file.writeAsBytes(pdfBytes);
+
+    log('PDF generated at: $path');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backGround,
       appBar: const MyHeader(
-        title: 'Weekly Planing',
+        title: 'Weekly Planning',
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(2),
@@ -57,15 +113,17 @@ class _PlaningState extends State<Planing> {
                 dataRowMaxHeight: 60,
                 columns: [
                   DataColumn(
-                      label: SizedBox(
-                          child: Text(
-                    'Server \\ Days',
-                    style: GoogleFonts.poppins(
-                        color: blackText,
-                        height: 0,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700),
-                  ))),
+                    label: SizedBox(
+                      child: Text(
+                        'Server \\ Days',
+                        style: GoogleFonts.poppins(
+                            color: blackText,
+                            height: 0,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ),
                   for (var day in daysOfWeek)
                     DataColumn(label: Text(day, style: simple)),
                 ],
@@ -109,10 +167,10 @@ class _PlaningState extends State<Planing> {
                   backgroundColor: mainColor,
                 ),
                 onPressed: () {
-                  // Handle button press
+                  generatePdf(); // Call the function to generate PDF
                   // You can add your logic here
                 },
-                child: const Text('Your Button'),
+                child: const Text('Generate PDF'),
               ),
             ),
             const SizedBox(
