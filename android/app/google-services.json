@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "507131666060",
+    "project_id": "weekly-planner-29e63",
+    "storage_bucket": "weekly-planner-29e63.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:507131666060:android:6ae61fbd75e28ec1c0e5a9",
+        "android_client_info": {
+          "package_name": "com.example.weekly_planner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpyH01ayXzDAMynAPeSKVcAD_rasYRRaU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

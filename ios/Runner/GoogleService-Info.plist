@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyBWD-mcUjT5RjPK_ZMXnYsydYO0p3pYqp0</string>
+	<key>GCM_SENDER_ID</key>
+	<string>507131666060</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.weeklyPlanner</string>
+	<key>PROJECT_ID</key>
+	<string>weekly-planner-29e63</string>
+	<key>STORAGE_BUCKET</key>
+	<string>weekly-planner-29e63.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:507131666060:ios:f49d4abd3b4130cfc0e5a9</string>
+</dict>
+</plist>
