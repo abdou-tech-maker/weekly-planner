@@ -26,33 +26,6 @@ const Color desactivatedButton = Color(0XFF526EFF);
 const Color headerGrey = Color(0xFF444444);
 const Color greenColor = Color(0xFF16A34A);
 
-//const BASEURL = "https://sourcing-dev-kno7vmxk7q-ew.a.run.app/"; // dev Url
-const BASEURL = "https://backend.okadoo.com/"; // new prod
-const AUTHORIZATION = "Authorization";
-
-String getStatus(String status) {
-  switch (status) {
-    case "Confirmed":
-      return "مؤكدة";
-    case "Pending":
-      return "غير مؤكدة";
-    case "Cancelled":
-      return "ألغيت";
-    default:
-      return 'Pending';
-  }
-}
-
-String getCreatedAtDate(String? createdAt) {
-  if (createdAt == null) {
-    return DateTime.now().toString();
-  }
-
-  String extractedDate = createdAt.substring(0, 10);
-
-  return extractedDate;
-}
-
 TextStyle? simple =
     GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500);
 

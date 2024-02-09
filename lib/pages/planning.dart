@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
@@ -28,7 +30,7 @@ class _PlaningState extends State<Planing> {
     'vendredi'
   ];
 
-  List<String> members = List.generate(10, (index) => 'Member ${index + 1}');
+  List<String> members = List.generate(30, (index) => 'Member ${index + 1}');
 
   List<List<String>> weeklyPlanning = [];
 
