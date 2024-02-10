@@ -47,20 +47,18 @@ void showErrorSnackBar(
     BuildContext context, String message, Color color, Color backGround) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      closeIconColor: Colors.white,
-      showCloseIcon: true,
+      showCloseIcon: false,
       margin: EdgeInsets.zero,
       elevation: 2,
       content: Text(
         message,
         overflow: TextOverflow.ellipsis,
-        style: GoogleFonts.almarai(
+        style: GoogleFonts.poppins(
             color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
       ),
       behavior: SnackBarBehavior.floating,
       backgroundColor: backGround,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
         side: BorderSide(
           color: color,
           width: 2,

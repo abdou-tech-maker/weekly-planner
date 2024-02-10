@@ -30,7 +30,7 @@ class _PlaningState extends State<Planing> {
     'vendredi'
   ];
 
-  List<String> members = List.generate(30, (index) => 'Member ${index + 1}');
+  List<String> members = List.filled(30, ''); // Initialize with empty strings
 
   List<List<String>> weeklyPlanning = [];
 
@@ -56,12 +56,14 @@ class _PlaningState extends State<Planing> {
           pw.Table.fromTextArray(
             context: context,
             data: [
-              ['Server \\ Days', ...daysOfWeek],
               for (var memberIndex = 0;
                   memberIndex < members.length;
                   memberIndex++)
                 [
-                  members[memberIndex],
+                  if (members[memberIndex].isEmpty)
+                    ''
+                  else
+                    members[memberIndex],
                   for (var dayIndex = 0;
                       dayIndex < daysOfWeek.length;
                       dayIndex++)
@@ -69,7 +71,7 @@ class _PlaningState extends State<Planing> {
                 ],
             ],
             headerDecoration: const pw.BoxDecoration(
-              color: PdfColors.grey300,
+              color: PdfColors.amber400,
             ),
             rowDecoration: const pw.BoxDecoration(
               border: pw.Border(),
@@ -86,7 +88,30 @@ class _PlaningState extends State<Planing> {
       ),
     );
 
-    // Get the external storage directory
+    // final Directory? externalDir = await getExternalStorageDirectory();
+
+    // if (externalDir == null) {
+    //   log('External storage directory not available');
+    //   return;
+    // }
+
+    // final String dcimDirectoryPath = externalDir.path;
+
+    // final Directory dcimDirectory = Directory(dcimDirectoryPath);
+    // if (!await dcimDirectory.exists()) {
+    //   await dcimDirectory.create();
+    // }
+    // final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+    // String pdfFileName = 'planning_$timestamp.pdf';
+
+    // final String pdfFilePath = '$dcimDirectoryPath/$pdfFileName';
+
+    // final File pdfFile = File(pdfFilePath);
+    // final Uint8List pdfBytes = await pdf.save();
+    // await pdfFile.writeAsBytes(pdfBytes);
+
+    // log('PDF generated at: $pdfFilePath');
+
     final Directory? externalDir = await getExternalStorageDirectory();
 
     if (externalDir == null) {
@@ -94,20 +119,14 @@ class _PlaningState extends State<Planing> {
       return;
     }
 
-    // Construct the path to the DCIM directory
-    final String dcimDirectoryPath = externalDir.path;
+    const String documentsDirectoryPath =
+        '/storage/emulated/0/Documents'; // Documents directory path
 
-    // Create the DCIM directory if it doesn't exist
-    final Directory dcimDirectory = Directory(dcimDirectoryPath);
-    if (!await dcimDirectory.exists()) {
-      await dcimDirectory.create();
-    }
+    final String timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
+    String pdfFileName = 'planning_$timeStamp.pdf';
 
-    // Generate a unique file name for the PDF
-    final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-    final String pdfFilePath = '$dcimDirectoryPath/$timestamp.pdf';
+    final String pdfFilePath = '$documentsDirectoryPath/$pdfFileName';
 
-    // Save the PDF to the specified file path
     final File pdfFile = File(pdfFilePath);
     final Uint8List pdfBytes = await pdf.save();
     await pdfFile.writeAsBytes(pdfBytes);
@@ -188,8 +207,12 @@ class _PlaningState extends State<Planing> {
                   backgroundColor: mainColor,
                 ),
                 onPressed: () {
-                  generatePdf(); // Call the function to generate PDF
-                  // You can add your logic here
+                  generatePdf();
+                  showErrorSnackBar(
+                      context,
+                      "The PDF has been generated successfully.",
+                      greenColor,
+                      greenColor);
                 },
                 child: const Text('Generate PDF'),
               ),
