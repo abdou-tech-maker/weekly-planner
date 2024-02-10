@@ -86,14 +86,33 @@ class _PlaningState extends State<Planing> {
       ),
     );
 
-    final Directory directory = await getApplicationDocumentsDirectory();
-    final String path = '${directory.path}/weekly_planning.pdf';
+    // Get the external storage directory
+    final Directory? externalDir = await getExternalStorageDirectory();
 
-    final File file = File(path);
+    if (externalDir == null) {
+      log('External storage directory not available');
+      return;
+    }
+
+    // Construct the path to the DCIM directory
+    final String dcimDirectoryPath = externalDir.path;
+
+    // Create the DCIM directory if it doesn't exist
+    final Directory dcimDirectory = Directory(dcimDirectoryPath);
+    if (!await dcimDirectory.exists()) {
+      await dcimDirectory.create();
+    }
+
+    // Generate a unique file name for the PDF
+    final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+    final String pdfFilePath = '$dcimDirectoryPath/$timestamp.pdf';
+
+    // Save the PDF to the specified file path
+    final File pdfFile = File(pdfFilePath);
     final Uint8List pdfBytes = await pdf.save();
-    await file.writeAsBytes(pdfBytes);
+    await pdfFile.writeAsBytes(pdfBytes);
 
-    log('PDF generated at: $path');
+    log('PDF generated at: $pdfFilePath');
   }
 
   @override
