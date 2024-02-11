@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
 import 'dart:developer';
 import 'dart:io';
@@ -53,81 +53,89 @@ class _PlaningState extends State<Planing> {
     );
   }
 
-  Future<void> generatePdf() async {
-    final pdf = pw.Document();
+  Future<bool> generatePdf() async {
+    try {
+      final pdf = pw.Document();
 
-    pdf.addPage(
-      pw.MultiPage(
-        build: (context) => [
-          pw.Table.fromTextArray(
-            context: context,
-            data: [
-              for (var memberIndex = 0;
-                  memberIndex < members.length;
-                  memberIndex++)
-                [
-                  if (members[memberIndex].isEmpty)
-                    ''
-                  else
-                    members[memberIndex],
-                  for (var dayIndex = 0;
-                      dayIndex < daysOfWeek.length;
-                      dayIndex++)
-                    weeklyPlanning[dayIndex][memberIndex],
-                ],
-            ],
-            headerDecoration: const pw.BoxDecoration(
-              color: PdfColors.amber400,
+      pdf.addPage(
+        pw.MultiPage(
+          build: (context) => [
+            pw.Table.fromTextArray(
+              context: context,
+              data: [
+                for (var memberIndex = 0;
+                    memberIndex < members.length;
+                    memberIndex++)
+                  [
+                    if (members[memberIndex].isEmpty)
+                      ''
+                    else
+                      members[memberIndex],
+                    for (var dayIndex = 0;
+                        dayIndex < daysOfWeek.length;
+                        dayIndex++)
+                      weeklyPlanning[dayIndex][memberIndex],
+                  ],
+              ],
+              headerDecoration: const pw.BoxDecoration(
+                color: PdfColors.amber400,
+              ),
+              rowDecoration: const pw.BoxDecoration(
+                border: pw.Border(),
+              ),
+              headers: List<String>.generate(daysOfWeek.length + 1, (index) {
+                if (index == 0) {
+                  return 'Server \\ Days';
+                } else {
+                  return daysOfWeek[index - 1];
+                }
+              }),
             ),
-            rowDecoration: const pw.BoxDecoration(
-              border: pw.Border(),
-            ),
-            headers: List<String>.generate(daysOfWeek.length + 1, (index) {
-              if (index == 0) {
-                return 'Server \\ Days';
-              } else {
-                return daysOfWeek[index - 1];
-              }
-            }),
-          ),
-        ],
-      ),
-    );
-    String androidVersion = await getAndroidVersion();
-    if (androidVersion.startsWith('10')) {
-      final Directory? externalDir = await getExternalStorageDirectory();
+          ],
+        ),
+      );
+      String androidVersion = await getAndroidVersion();
+      if (androidVersion.startsWith('10')) {
+        final Directory? externalDir = await getExternalStorageDirectory();
 
-      if (externalDir == null) {
-        log('External storage directory not available');
-        return;
+        if (externalDir == null) {
+          log('External storage directory not available');
+          return false;
+        }
+        log("$externalDir");
+        if (!await Permission.storage.request().isGranted) {
+          log('Permission denied');
+          return false;
+        }
+
+        final String timeStamp =
+            DateTime.now().millisecondsSinceEpoch.toString();
+        String pdfFileName = 'planning_$timeStamp.pdf';
+
+        final String pdfFilePath = '${externalDir.path}/$pdfFileName';
+
+        final File pdfFile = File(pdfFilePath);
+        final Uint8List pdfBytes = await pdf.save();
+        await pdfFile.writeAsBytes(pdfBytes);
+        log('PDF generated at using android 10: $pdfFilePath');
+      } else {
+        const String documentsDirectoryPath =
+            '/storage/emulated/0/Documents'; // Documents directory path
+        final String timeStamp =
+            DateTime.now().millisecondsSinceEpoch.toString();
+        String pdfFileName = 'planning_$timeStamp.pdf';
+
+        final String pdfFilePath = '$documentsDirectoryPath/$pdfFileName';
+
+        final File pdfFile = File(pdfFilePath);
+        final Uint8List pdfBytes = await pdf.save();
+        await pdfFile.writeAsBytes(pdfBytes);
+        log('PDF generated at using android above 10 or diferrent then 10: $pdfFilePath');
       }
-      log("$externalDir");
-      if (!await Permission.storage.request().isGranted) {
-        log('Permission denied');
-        return;
-      }
-
-      final String timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
-      String pdfFileName = 'planning_$timeStamp.pdf';
-
-      final String pdfFilePath = '${externalDir.path}/$pdfFileName';
-
-      final File pdfFile = File(pdfFilePath);
-      final Uint8List pdfBytes = await pdf.save();
-      await pdfFile.writeAsBytes(pdfBytes);
-      log('PDF generated at using android 10: $pdfFilePath');
-    } else {
-      const String documentsDirectoryPath =
-          '/storage/emulated/0/Documents'; // Documents directory path
-      final String timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
-      String pdfFileName = 'planning_$timeStamp.pdf';
-
-      final String pdfFilePath = '$documentsDirectoryPath/$pdfFileName';
-
-      final File pdfFile = File(pdfFilePath);
-      final Uint8List pdfBytes = await pdf.save();
-      await pdfFile.writeAsBytes(pdfBytes);
-      log('PDF generated at using android above 10 or diferrent then 10: $pdfFilePath');
+      return true;
+    } catch (e) {
+      log('Error generating PDF: $e');
+      return false;
     }
   }
 
@@ -198,18 +206,26 @@ class _PlaningState extends State<Planing> {
               height: 20.0, // Adjust the height as needed
             ),
             Align(
-              alignment: Alignment.centerRight,
+              alignment: Alignment.center,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: mainColor,
                 ),
-                onPressed: () {
-                  generatePdf();
-                  showErrorSnackBar(
-                      context,
-                      "The PDF has been generated successfully.",
-                      greenColor,
-                      greenColor);
+                onPressed: () async {
+                  bool success = await generatePdf();
+                  if (success) {
+                    showErrorSnackBar(
+                        context,
+                        "The PDF has been generated successfully.",
+                        greenColor,
+                        greenColor);
+                  } else {
+                    showErrorSnackBar(
+                        context,
+                        "Error generating PDF. Please try again.",
+                        redColor,
+                        redColor);
+                  }
                 },
                 child: const Text('Generate PDF'),
               ),
