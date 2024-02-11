@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
@@ -30,6 +31,10 @@ class _PlaningState extends State<Planing> {
     'jeudi',
     'vendredi'
   ];
+  Future<String> getAndroidVersion() async {
+    AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
+    return androidInfo.version.release;
+  }
 
   List<String> members = List.filled(30, ''); // Initialize with empty strings
 
@@ -88,37 +93,42 @@ class _PlaningState extends State<Planing> {
         ],
       ),
     );
+    String androidVersion = await getAndroidVersion();
+    if (androidVersion.startsWith('10')) {
+      final Directory? externalDir = await getExternalStorageDirectory();
 
-    final Directory? externalDir = await getExternalStorageDirectory();
+      if (externalDir == null) {
+        log('External storage directory not available');
+        return;
+      }
+      log("$externalDir");
+      if (!await Permission.storage.request().isGranted) {
+        log('Permission denied');
+        return;
+      }
 
-    if (externalDir == null) {
-      log('External storage directory not available');
-      return;
+      final String timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
+      String pdfFileName = 'planning_$timeStamp.pdf';
+
+      final String pdfFilePath = '${externalDir.path}/$pdfFileName';
+
+      final File pdfFile = File(pdfFilePath);
+      final Uint8List pdfBytes = await pdf.save();
+      await pdfFile.writeAsBytes(pdfBytes);
+      log('PDF generated at using android 10: $pdfFilePath');
+    } else {
+      const String documentsDirectoryPath =
+          '/storage/emulated/0/Documents'; // Documents directory path
+      final String timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
+      String pdfFileName = 'planning_$timeStamp.pdf';
+
+      final String pdfFilePath = '$documentsDirectoryPath/$pdfFileName';
+
+      final File pdfFile = File(pdfFilePath);
+      final Uint8List pdfBytes = await pdf.save();
+      await pdfFile.writeAsBytes(pdfBytes);
+      log('PDF generated at using android above 10 or diferrent then 10: $pdfFilePath');
     }
-    log("$externalDir");
-    if (!await Permission.storage.request().isGranted) {
-      log('Permission denied');
-      return;
-    }
-
-    // final String timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
-    // String pdfFileName = 'planning_$timeStamp.pdf';
-
-    // final String pdfFilePath = '$externalDir/$pdfFileName';
-
-    // final File pdfFile = File(pdfFilePath);
-    // final Uint8List pdfBytes = await pdf.save();
-    // await pdfFile.writeAsBytes(pdfBytes);
-    final String timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
-    String pdfFileName = 'planning_$timeStamp.pdf';
-
-    final String pdfFilePath = '${externalDir.path}/$pdfFileName';
-
-    final File pdfFile = File(pdfFilePath);
-    final Uint8List pdfBytes = await pdf.save();
-    await pdfFile.writeAsBytes(pdfBytes);
-
-    log('PDF generated at: $pdfFilePath');
   }
 
   @override
