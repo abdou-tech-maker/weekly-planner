@@ -26,6 +26,7 @@ class _PlaningState extends State<Planing> {
   List<String> daysOfWeek = [
     'samedi',
     'dimanche',
+    'lundi',
     'mardi',
     'mercredi',
     'jeudi',
@@ -45,7 +46,7 @@ class _PlaningState extends State<Planing> {
     super.initState();
 
     weeklyPlanning = List.generate(
-      6, // Number of days (columns)
+      7, // Number of days (columns)
       (index) => List.generate(
         members.length, // Number of members (rows)
         (index) => '', // Initial value for each cell
@@ -85,7 +86,7 @@ class _PlaningState extends State<Planing> {
               ),
               headers: List<String>.generate(daysOfWeek.length + 1, (index) {
                 if (index == 0) {
-                  return 'Server \\ Days';
+                  return 'S \\ Jours';
                 } else {
                   return daysOfWeek[index - 1];
                 }
@@ -160,7 +161,7 @@ class _PlaningState extends State<Planing> {
                   DataColumn(
                     label: SizedBox(
                       child: Text(
-                        'Server \\ Days',
+                        'S \\ Jours',
                         style: GoogleFonts.poppins(
                             color: blackText,
                             height: 0,
