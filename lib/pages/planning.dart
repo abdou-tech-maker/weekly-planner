@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:permission_handler/permission_handler.dart';
 
 import '../constantes/constantes.dart';
 import '../widgets/appHeader.dart';
@@ -88,44 +89,30 @@ class _PlaningState extends State<Planing> {
       ),
     );
 
-    // final Directory? externalDir = await getExternalStorageDirectory();
-
-    // if (externalDir == null) {
-    //   log('External storage directory not available');
-    //   return;
-    // }
-
-    // final String dcimDirectoryPath = externalDir.path;
-
-    // final Directory dcimDirectory = Directory(dcimDirectoryPath);
-    // if (!await dcimDirectory.exists()) {
-    //   await dcimDirectory.create();
-    // }
-    // final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-    // String pdfFileName = 'planning_$timestamp.pdf';
-
-    // final String pdfFilePath = '$dcimDirectoryPath/$pdfFileName';
-
-    // final File pdfFile = File(pdfFilePath);
-    // final Uint8List pdfBytes = await pdf.save();
-    // await pdfFile.writeAsBytes(pdfBytes);
-
-    // log('PDF generated at: $pdfFilePath');
-
     final Directory? externalDir = await getExternalStorageDirectory();
 
     if (externalDir == null) {
       log('External storage directory not available');
       return;
     }
+    log("$externalDir");
+    if (!await Permission.storage.request().isGranted) {
+      log('Permission denied');
+      return;
+    }
 
-    const String documentsDirectoryPath =
-        '/storage/emulated/0/Documents'; // Documents directory path
+    // final String timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
+    // String pdfFileName = 'planning_$timeStamp.pdf';
 
+    // final String pdfFilePath = '$externalDir/$pdfFileName';
+
+    // final File pdfFile = File(pdfFilePath);
+    // final Uint8List pdfBytes = await pdf.save();
+    // await pdfFile.writeAsBytes(pdfBytes);
     final String timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
     String pdfFileName = 'planning_$timeStamp.pdf';
 
-    final String pdfFilePath = '$documentsDirectoryPath/$pdfFileName';
+    final String pdfFilePath = '${externalDir.path}/$pdfFileName';
 
     final File pdfFile = File(pdfFilePath);
     final Uint8List pdfBytes = await pdf.save();
